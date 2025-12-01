@@ -299,8 +299,11 @@ const App: React.FC = () => {
                 </button>
               </div>
             </div>
-            <div className="container mx-auto px-4 mt-16 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
+            <div className="container mx-auto px-4 mt-16 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4">
               <p>&copy; {new Date().getFullYear()} צפת בתנופה. כל הזכויות שמורות.</p>
+              <p className="font-bold text-gray-500 hover:text-white transition-colors cursor-default">
+                פיתוח ובנייה: DA פרויקטים ויזמות
+              </p>
             </div>
           </footer>
 
