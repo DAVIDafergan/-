@@ -11,22 +11,22 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Contact } from './pages/Contact';
 import { AccessibilityWidget } from './components/AccessibilityWidget';
-import { INITIAL_POSTS, INITIAL_ADS, INITIAL_COMMENTS, INITIAL_USERS, INITIAL_MESSAGES, INITIAL_SUBSCRIBERS } from './services/mockData';
 import { Post, Ad, User, Comment, ContactMessage, Category, NewsletterSubscriber, AccessibilitySettings } from './types';
 import { AppContext } from './context/AppContext';
-
-// Admin Credentials (Hardcoded)
-const ADMIN_USER = 'SMULIK8181';
-const ADMIN_PASS = '8181';
+import { api } from './services/api';
+import { Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
-  const [ads, setAds] = useState<Ad[]>(INITIAL_ADS);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Data State
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
-  const [registeredUsers, setRegisteredUsers] = useState<User[]>(INITIAL_USERS);
-  const [contactMessages, setContactMessages] = useState<ContactMessage[]>(INITIAL_MESSAGES);
-  const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>(INITIAL_SUBSCRIBERS);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [registeredUsers, setRegisteredUsers] = useState<User[]>([]);
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>([]);
   
   // Accessibility State
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
@@ -37,103 +37,101 @@ const App: React.FC = () => {
     stopAnimations: false,
   });
 
-  // Persistence
+  // Initial Data Fetch
   useEffect(() => {
-    const savedPosts = localStorage.getItem('zfat_posts');
-    if (savedPosts) setPosts(JSON.parse(savedPosts));
-    
-    const savedAds = localStorage.getItem('zfat_ads');
-    if (savedAds) setAds(JSON.parse(savedAds));
-
-    const savedUser = localStorage.getItem('zfat_user');
-    if (savedUser) setUser(JSON.parse(savedUser));
-
-    const savedComments = localStorage.getItem('zfat_comments');
-    if (savedComments) setComments(JSON.parse(savedComments));
-
-    const savedUsersDB = localStorage.getItem('zfat_users_db');
-    if (savedUsersDB) setRegisteredUsers(JSON.parse(savedUsersDB));
-
-    const savedMessages = localStorage.getItem('zfat_messages');
-    if (savedMessages) setContactMessages(JSON.parse(savedMessages));
-
-    const savedSubs = localStorage.getItem('zfat_subscribers');
-    if (savedSubs) setNewsletterSubscribers(JSON.parse(savedSubs));
+    const init = async () => {
+      setIsLoading(true);
+      try {
+        const data = await api.fetchInitialData();
+        setPosts(data.posts);
+        setAds(data.ads);
+        setComments(data.comments);
+        setRegisteredUsers(data.registeredUsers);
+        if(data.contactMessages) setContactMessages(data.contactMessages);
+        if(data.newsletterSubscribers) setNewsletterSubscribers(data.newsletterSubscribers);
+        
+        // Restore user session
+        const savedUser = localStorage.getItem('zfat_user');
+        if (savedUser) setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Failed to load initial data", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    init();
   }, []);
 
-  useEffect(() => { localStorage.setItem('zfat_posts', JSON.stringify(posts)); }, [posts]);
-  useEffect(() => { localStorage.setItem('zfat_ads', JSON.stringify(ads)); }, [ads]);
+  // Persist User Session only
   useEffect(() => { 
     if (user) localStorage.setItem('zfat_user', JSON.stringify(user));
     else localStorage.removeItem('zfat_user');
   }, [user]);
-  useEffect(() => { localStorage.setItem('zfat_comments', JSON.stringify(comments)); }, [comments]);
-  useEffect(() => { localStorage.setItem('zfat_users_db', JSON.stringify(registeredUsers)); }, [registeredUsers]);
-  useEffect(() => { localStorage.setItem('zfat_messages', JSON.stringify(contactMessages)); }, [contactMessages]);
-  useEffect(() => { localStorage.setItem('zfat_subscribers', JSON.stringify(newsletterSubscribers)); }, [newsletterSubscribers]);
 
-  const addPost = (post: Post) => {
+  // Actions wrapped with API calls
+  const addPost = async (post: Post) => {
+    await api.addPost(post);
     setPosts(prev => [post, ...prev]);
   };
 
-  const deletePost = (id: string) => {
+  const deletePost = async (id: string) => {
+    await api.deletePost(id);
     setPosts(prev => prev.filter(p => p.id !== id));
   };
 
   const incrementViews = (id: string) => {
+    api.incrementViews(id);
     setPosts(prev => prev.map(post => 
       post.id === id ? { ...post, views: (post.views || 0) + 1 } : post
     ));
   };
 
-  const updateAd = (id: string, updates: Partial<Ad>) => {
+  const updateAd = async (id: string, updates: Partial<Ad>) => {
+    await api.updateAd(id, updates);
     setAds(prev => prev.map(ad => ad.id === id ? { ...ad, ...updates } : ad));
   };
 
-  const createAd = (ad: Ad) => {
+  const createAd = async (ad: Ad) => {
+    await api.createAd(ad);
     setAds(prev => [...prev, ad]);
   };
 
-  const deleteAd = (id: string) => {
+  const deleteAd = async (id: string) => {
+    await api.deleteAd(id);
     setAds(prev => prev.filter(a => a.id !== id));
   };
 
-  const login = (usernameOrEmail: string, password: string): boolean => {
-    // Check Admin
-    if (usernameOrEmail === ADMIN_USER && password === ADMIN_PASS) {
-      setUser({ id: 'admin1', name: 'מנהל ראשי', role: 'admin', isAuthenticated: true });
+  const login = async (usernameOrEmail: string, password: string): Promise<boolean> => {
+    const authenticatedUser = await api.login(usernameOrEmail, password);
+    if (authenticatedUser) {
+      setUser(authenticatedUser);
       return true;
     }
-
-    // Check Registered Users
-    const foundUser = registeredUsers.find(u => (u.email === usernameOrEmail || u.name === usernameOrEmail) && u.password === password);
-    if (foundUser) {
-      setUser({ ...foundUser, isAuthenticated: true });
-      return true;
-    }
-
     return false;
   };
 
-  const register = (newUser: User): boolean => {
-    if (registeredUsers.some(u => u.email === newUser.email)) {
-      return false; // User exists
+  const register = async (newUser: User): Promise<boolean> => {
+    const success = await api.register(newUser);
+    if (success) {
+      setRegisteredUsers(prev => [...prev, newUser]);
+      setUser({ ...newUser, isAuthenticated: true });
+      return true;
     }
-    setRegisteredUsers(prev => [...prev, newUser]);
-    setUser({ ...newUser, isAuthenticated: true });
-    return true;
+    return false;
   };
 
   const logout = () => {
     setUser(null);
   };
 
-  const addComment = (comment: Comment) => {
+  const addComment = async (comment: Comment) => {
+    await api.addComment(comment);
     setComments(prev => [...prev, comment]);
   };
 
-  const toggleLikeComment = (commentId: string) => {
+  const toggleLikeComment = async (commentId: string) => {
     if (!user) return;
+    await api.toggleLike(commentId, user.id);
     setComments(prev => prev.map(c => {
       if (c.id === commentId) {
         const hasLiked = c.likedBy.includes(user.id);
@@ -147,38 +145,34 @@ const App: React.FC = () => {
     }));
   };
 
-  const addContactMessage = (msg: ContactMessage) => {
+  const addContactMessage = async (msg: ContactMessage) => {
+    await api.sendMessage(msg);
     setContactMessages(prev => [msg, ...prev]);
   };
 
-  const subscribeToNewsletter = (email: string) => {
-    if (newsletterSubscribers.some(s => s.email === email)) return false;
-    setNewsletterSubscribers(prev => [...prev, {
-      id: Date.now().toString(),
-      email,
-      joinedDate: new Date().toLocaleDateString('he-IL'),
-      isActive: true
-    }]);
-    return true;
+  const subscribeToNewsletter = async (email: string) => {
+    const success = await api.subscribe(email);
+    if (success) {
+      setNewsletterSubscribers(prev => [...prev, {
+        id: Date.now().toString(),
+        email,
+        joinedDate: new Date().toLocaleDateString('he-IL'),
+        isActive: true
+      }]);
+    }
+    return success;
   };
 
-  const sendNewsletter = (subject: string, content: string, postId?: string) => {
+  const sendNewsletter = async (subject: string, content: string, postId?: string) => {
+    // Mock sending email
     console.log(`Sending Newsletter to ${newsletterSubscribers.length} subscribers.`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Content: ${content}`);
-    if (postId) console.log(`Linked Post: ${postId}`);
+    await new Promise(r => setTimeout(r, 1000));
     alert(`הניוזלטר נשלח בהצלחה ל-${newsletterSubscribers.length} מנויים!`);
   };
 
-  const handleSearch = (query: string) => {
-    console.log('Searching for:', query);
-    // In a real app, you might redirect to a search results page
-    // navigate(`/search?q=${query}`);
-  };
-
-  // Accessibility Handlers
+  // Accessibility Logic
   const toggleAccessibilityOption = (option: keyof AccessibilitySettings) => {
-    if (option === 'fontSize') return; // Handled separately
+    if (option === 'fontSize') return; 
     setAccessibility(prev => ({ ...prev, [option]: !prev[option] }));
   };
 
@@ -196,30 +190,32 @@ const App: React.FC = () => {
     });
   };
 
-  // Apply Accessibility Classes to Body
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
-
-    // Font Size (CSS variable)
     const scale = accessibility.fontSize === 0 ? 1 : accessibility.fontSize === 1 ? 1.15 : 1.3;
     root.style.setProperty('--font-scale', scale.toString());
-
-    // Toggle Classes
     body.classList.toggle('a11y-grayscale', accessibility.grayscale);
     body.classList.toggle('a11y-high-contrast', accessibility.highContrast);
     body.classList.toggle('a11y-highlight-links', accessibility.highlightLinks);
     body.classList.toggle('a11y-stop-animations', accessibility.stopAnimations);
-
   }, [accessibility]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-4">
+        <img src="logo.png" alt="Loading..." className="h-16 w-auto animate-pulse opacity-50" onError={(e) => e.currentTarget.style.display = 'none'} />
+        <Loader2 size={40} className="animate-spin text-red-700" />
+        <p className="text-gray-500 font-bold">טוען נתונים...</p>
+      </div>
+    );
+  }
 
-  // Filter posts for ticker: Only show 'מבזקים'
   const tickerPosts = posts.filter(p => p.category === Category.NEWS);
 
   return (
     <AppContext.Provider value={{ 
-      posts, ads, user, comments, registeredUsers, contactMessages, newsletterSubscribers, accessibility,
+      posts, ads, user, comments, registeredUsers, contactMessages, newsletterSubscribers, accessibility, isLoading,
       addPost, deletePost, incrementViews, updateAd, createAd, deleteAd, login, logout, register, 
       addComment, toggleLikeComment, addContactMessage, subscribeToNewsletter, sendNewsletter,
       toggleAccessibilityOption, setFontSize, resetAccessibility
@@ -227,15 +223,13 @@ const App: React.FC = () => {
       <HashRouter>
         <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#f8f9fa] relative">
           
-          {/* Skip Link for Accessibility */}
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-1/2 focus:-translate-x-1/2 focus:bg-yellow-400 focus:text-black focus:px-4 focus:py-2 focus:z-[100] focus:rounded font-bold shadow-xl">
             דלג לתוכן הראשי
           </a>
 
-          <Header onSearch={handleSearch} user={user} />
+          <Header onSearch={() => {}} user={user} />
           
           <div className="hidden md:block">
-            {/* NewsTicker only shows active flash news */}
             <NewsTicker posts={tickerPosts.slice(0, 10)} />
           </div>
           
@@ -265,12 +259,11 @@ const App: React.FC = () => {
                       e.currentTarget.nextElementSibling?.classList.remove('hidden');
                     }} 
                    />
-                   {/* Fallback Footer Logo */}
                    <div className="hidden text-white leading-none">
                      <h3 className="text-3xl font-black tracking-tight">צפת<span className="text-red-600">בתנופה</span></h3>
                    </div>
                 </div>
-                <p className="text-sm leading-relaxed text-gray-400">האתר המוביל לחדשות, תרבות וקהילה בצפת והגליל. אנחנו כאן בשבילכם.</p>
+                <p className="text-sm leading-relaxed text-gray-400">האתר המוביל לחדשות, תרבות וקהילה בצפת והגליל.</p>
               </div>
               <div>
                 <h4 className="text-white font-bold mb-6 border-b border-gray-800 pb-2 inline-block">ניווט מהיר</h4>
@@ -285,7 +278,6 @@ const App: React.FC = () => {
                 <ul className="space-y-3 text-sm">
                   <li><a href="/#/category/מבזקים" className="hover:text-red-500 transition">מבזקים</a></li>
                   <li><a href="/#/category/נדלן" className="hover:text-red-500 transition">נדל"ן</a></li>
-                  <li><a href="/#/category/ספורט" className="hover:text-red-500 transition">ספורט</a></li>
                 </ul>
               </div>
               <div>
@@ -307,7 +299,6 @@ const App: React.FC = () => {
             </div>
           </footer>
 
-          {/* Global Accessibility Widget */}
           <AccessibilityWidget />
         </div>
       </HashRouter>

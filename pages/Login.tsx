@@ -2,27 +2,33 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, User, ShieldCheck } from 'lucide-react';
+import { Lock, User, Loader2 } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, user } = useApp();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const success = login(username, password);
-    if (success) {
-      navigate('/');
-    } else {
-      setError('שם משתמש או סיסמה שגויים');
+    setIsSubmitting(true);
+    
+    try {
+        const success = await login(username, password);
+        if (success) {
+          navigate('/');
+        } else {
+          setError('שם משתמש או סיסמה שגויים');
+        }
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
-  // If already logged in, redirect
   if (user) {
     if (user.role === 'admin') navigate('/admin');
     else navigate('/');
@@ -31,7 +37,6 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-[#f8f9fa] px-4 py-12">
       <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl max-w-md w-full border border-gray-100 relative overflow-hidden">
-        {/* Decorative Top Line */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-800"></div>
         
         <div className="text-center mb-10">
@@ -79,9 +84,10 @@ export const Login: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-red-700 to-red-800 text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:from-red-800 hover:to-red-900 transition-all transform active:scale-95"
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-red-700 to-red-800 text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:from-red-800 hover:to-red-900 transition-all transform active:scale-95 flex items-center justify-center gap-2"
           >
-            כניסה
+            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : 'כניסה'}
           </button>
         </form>
         

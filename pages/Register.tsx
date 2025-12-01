@@ -2,17 +2,18 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Lock, UserPlus, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, UserPlus, ArrowRight, Loader2 } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useApp();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -20,27 +21,32 @@ export const Register: React.FC = () => {
       setError('נא למלא את כל השדות');
       return;
     }
+    
+    setIsSubmitting(true);
+    try {
+        const success = await register({
+          id: Date.now().toString(),
+          name,
+          email,
+          password,
+          role: 'user',
+          isAuthenticated: true,
+          joinedDate: new Date().toISOString().split('T')[0]
+        });
 
-    const success = register({
-      id: Date.now().toString(),
-      name,
-      email,
-      password,
-      role: 'user',
-      isAuthenticated: true,
-      joinedDate: new Date().toISOString().split('T')[0]
-    });
-
-    if (success) {
-      navigate('/');
-    } else {
-      setError('כתובת האימייל כבר רשומה במערכת');
+        if (success) {
+          navigate('/');
+        } else {
+          setError('כתובת האימייל כבר רשומה במערכת');
+        }
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-[#f8f9fa] px-4 py-12">
-      <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl max-w-md w-full border border-gray-100 relative overflow-hidden animate-fade-in">
+      <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl max-w-md w-full border border-gray-100 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-800"></div>
         
         <div className="text-center mb-8">
@@ -103,9 +109,10 @@ export const Register: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-red-700 text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:bg-red-800 transition-all transform active:scale-95 mt-2"
+            disabled={isSubmitting}
+            className="w-full bg-red-700 text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:bg-red-800 transition-all transform active:scale-95 mt-2 flex items-center justify-center gap-2"
           >
-            הרשמה
+             {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : 'הרשמה'}
           </button>
         </form>
         

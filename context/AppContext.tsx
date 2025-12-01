@@ -11,23 +11,28 @@ export interface AppState {
   contactMessages: ContactMessage[];
   newsletterSubscribers: NewsletterSubscriber[];
   accessibility: AccessibilitySettings;
+  isLoading: boolean;
   
-  addPost: (post: Post) => void;
-  deletePost: (id: string) => void;
-  incrementViews: (id: string) => void; // Added incrementViews
-  updateAd: (id: string, updates: Partial<Ad>) => void;
-  createAd: (ad: Ad) => void;
-  deleteAd: (id: string) => void;
-  login: (usernameOrEmail: string, password: string) => boolean;
+  // Async Actions
+  addPost: (post: Post) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
+  incrementViews: (id: string) => void;
+  updateAd: (id: string, updates: Partial<Ad>) => Promise<void>;
+  createAd: (ad: Ad) => Promise<void>;
+  deleteAd: (id: string) => Promise<void>;
+  
+  login: (usernameOrEmail: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (user: User) => boolean;
-  addComment: (comment: Comment) => void;
-  toggleLikeComment: (commentId: string) => void;
-  addContactMessage: (msg: ContactMessage) => void;
-  subscribeToNewsletter: (email: string) => boolean;
-  sendNewsletter: (subject: string, content: string, postId?: string) => void;
+  register: (user: User) => Promise<boolean>;
   
-  // Accessibility
+  addComment: (comment: Comment) => Promise<void>;
+  toggleLikeComment: (commentId: string) => Promise<void>;
+  
+  addContactMessage: (msg: ContactMessage) => Promise<void>;
+  subscribeToNewsletter: (email: string) => Promise<boolean>;
+  sendNewsletter: (subject: string, content: string, postId?: string) => Promise<void>;
+  
+  // Accessibility (Sync)
   toggleAccessibilityOption: (option: keyof AccessibilitySettings) => void;
   setFontSize: (size: number) => void;
   resetAccessibility: () => void;
