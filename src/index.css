@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-scale: 1;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  background-color: #f8f9fa;
+  color: #1a1a1a;
+  /* Font size scaling handled via html font-size in App.tsx now */
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  transition: font-size 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #b91c1c;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #991b1b;
+}
+
+/* Animation Utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Accessibility Modes */
+.a11y-grayscale {
+  filter: grayscale(100%);
+}
+
+.a11y-high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+.a11y-high-contrast * {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+}
+/* Ensure Accessibility Widget remains visible in High Contrast */
+.a11y-high-contrast .accessibility-widget-btn {
+  background-color: #ffff00 !important;
+  color: #000 !important;
+  border: 2px solid #fff !important;
+}
+.a11y-high-contrast .accessibility-widget-container {
+  background-color: #000 !important;
+  border: 2px solid #fff !important;
+}
+.a11y-high-contrast .accessibility-widget-container button {
+  border: 1px solid #fff !important;
+}
+
+.a11y-high-contrast img, 
+.a11y-high-contrast video {
+  filter: contrast(150%);
+}
+.a11y-high-contrast a {
+  color: #ffff00 !important;
+  text-decoration: underline !important;
+}
+
+.a11y-highlight-links a {
+  text-decoration: underline !important;
+  background-color: rgba(255, 255, 0, 0.2);
+}
+.a11y-highlight-links button {
+  outline: 2px solid #0000ff;
+}
+
+.a11y-stop-animations *,
+.a11y-stop-animations *::before,
+.a11y-stop-animations *::after {
+  animation: none !important;
+  transition: none !important;
+}

@@ -1,4 +1,3 @@
-
 export enum Category {
   NEWS = 'מבזקים',
   COMMUNITY = 'קהילה וחברה',

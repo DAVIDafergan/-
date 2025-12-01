@@ -126,7 +126,7 @@ export const Article: React.FC = () => {
         <div className="rounded-xl overflow-hidden shadow-lg mb-8">
           <img src={post.imageUrl} alt={post.title} className="w-full h-auto object-cover max-h-[500px]" />
           <div className="bg-gray-100 px-4 py-2 text-xs text-gray-500 text-left">
-            צילום: דוברות / רשתות חברתיות
+            צילום: {post.imageCredit || 'דוברות / רשתות חברתיות'}
           </div>
         </div>
 

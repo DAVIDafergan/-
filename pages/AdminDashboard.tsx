@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Category, Post, Ad, AdSlide } from '../types';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Layout, LogOut, Image as ImageIcon, Link as LinkIcon, Users, Mail, Trash2, Edit2, GripVertical, Check, X as XIcon, Save, Video, Bell, Upload } from 'lucide-react';
+import { Plus, Layout, LogOut, Image as ImageIcon, Link as LinkIcon, Users, Mail, Trash2, Edit2, GripVertical, Check, X as XIcon, Save, Video, Bell, Upload, Camera } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, logout, addPost, deletePost, ads, updateAd, registeredUsers, contactMessages, posts } = useApp();
@@ -17,6 +17,7 @@ export const AdminDashboard: React.FC = () => {
     excerpt: '',
     content: '',
     imageUrl: '',
+    imageCredit: '', // Initialize credit
     tags: [],
     isFeatured: false,
   });
@@ -62,6 +63,7 @@ export const AdminDashboard: React.FC = () => {
       author: user?.name || 'Admin',
       date: new Date().toISOString().split('T')[0],
       imageUrl: newPost.imageUrl || 'https://picsum.photos/800/600',
+      imageCredit: newPost.imageCredit || 'רשתות חברתיות', // Use input or default
       tags: tagsInput.split(',').map(t => t.trim()).filter(Boolean),
       isFeatured: newPost.isFeatured || false,
       views: 0,
@@ -77,6 +79,7 @@ export const AdminDashboard: React.FC = () => {
       excerpt: '',
       content: '',
       imageUrl: '',
+      imageCredit: '',
       tags: [],
       isFeatured: false,
     });
@@ -381,15 +384,33 @@ export const AdminDashboard: React.FC = () => {
                         )}
                     </div>
                  </div>
-                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">תגיות (מופרדות בפסיק)</label>
-                    <input
-                        type="text"
-                        value={tagsInput}
-                        onChange={(e) => setTagsInput(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 outline-none"
-                        placeholder="צפת, שלג, עירייה..."
-                    />
+                 
+                 {/* Right Column: Credit and Tags */}
+                 <div className="flex flex-col gap-6">
+                     <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">קרדיט צילום</label>
+                        <div className="relative">
+                             <Camera size={18} className="absolute top-2.5 right-3 text-gray-400" />
+                             <input
+                                type="text"
+                                value={newPost.imageCredit || ''}
+                                onChange={(e) => setNewPost({...newPost, imageCredit: e.target.value})}
+                                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 outline-none"
+                                placeholder="לדוגמה: דוברות העירייה / פלוני אלמוני"
+                            />
+                        </div>
+                     </div>
+
+                     <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">תגיות (מופרדות בפסיק)</label>
+                        <input
+                            type="text"
+                            value={tagsInput}
+                            onChange={(e) => setTagsInput(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 outline-none"
+                            placeholder="צפת, שלג, עירייה..."
+                        />
+                     </div>
                  </div>
               </div>
 
