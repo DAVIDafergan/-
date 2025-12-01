@@ -1,5 +1,3 @@
-/// <reference types="react" />
-
 declare module '*.svg' {
   import * as React from 'react';
   export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>;
@@ -8,45 +6,16 @@ declare module '*.svg' {
 }
 
 declare module '*.png' {
-  const src: string;
-  export default src;
+  const value: string;
+  export default value;
 }
 
 declare module '*.jpg' {
-  const src: string;
-  export default src;
+  const value: string;
+  export default value;
 }
 
 declare module '*.jpeg' {
-  const src: string;
-  export default src;
-}
-
-declare module '*.gif' {
-  const src: string;
-  export default src;
-}
-
-declare module '*.bmp' {
-  const src: string;
-  export default src;
-}
-
-declare module '*.tiff' {
-  const src: string;
-  export default src;
-}
-
-declare module '*.webp' {
-  const src: string;
-  export default src;
-}
-
-interface ImportMetaEnv {
-  readonly VITE_APP_TITLE: string
-  [key: string]: any
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
+  const value: string;
+  export default value;
 }

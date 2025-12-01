@@ -9,11 +9,10 @@ interface HeaderProps {
   user: User | null;
 }
 
-export const Header: React.FC = () => {
+export const Header = ({ onSearch, user }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
-  // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [suggestions, setSuggestions] = useState<Post[]>([]);
@@ -22,7 +21,7 @@ export const Header: React.FC = () => {
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   
-  const { logout, posts, user } = useApp();
+  const { logout, posts } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
@@ -42,7 +41,6 @@ export const Header: React.FC = () => {
     setSuggestions([]);
   }, [location]);
 
-  // Click outside to close search suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -53,7 +51,6 @@ export const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Auto-suggest logic
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
       const filtered = posts.filter(p => 
@@ -69,8 +66,7 @@ export const Header: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // onSearch(searchQuery); // Header now self-contained or this needs prop
-      // Since prop was empty function in App.tsx, we can likely ignore it or implement global search
+      onSearch(searchQuery);
       setIsMenuOpen(false);
       setIsSearchFocused(false);
     }
@@ -93,7 +89,6 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Spacer for Fixed Header */}
       <div className="h-16 lg:h-24"></div>
 
       <header 
@@ -106,7 +101,6 @@ export const Header: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-14 lg:h-16">
             
-            {/* Mobile Menu Button */}
             <button 
               className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
               onClick={() => setIsMenuOpen(true)}
@@ -114,11 +108,9 @@ export const Header: React.FC = () => {
               <Menu size={28} />
             </button>
 
-            {/* Logo Section */}
             <Link to="/" className="flex items-center justify-center flex-1 lg:flex-none lg:justify-start">
                <div className="relative group cursor-pointer flex items-center gap-2">
                  <div className="flex items-center">
-                    {/* Logo Image */}
                     <img 
                       src="/logo.png" 
                       alt="לוגו צפת בתנופה" 
@@ -129,7 +121,6 @@ export const Header: React.FC = () => {
                         e.currentTarget.nextElementSibling?.classList.add('flex');
                       }}
                     />
-                    {/* Fallback Text Logo */}
                     <div className="hidden flex-col items-start leading-none text-white">
                       <span className="text-2xl md:text-3xl font-black tracking-tighter drop-shadow-sm">
                         צפת בתנופה
@@ -142,7 +133,6 @@ export const Header: React.FC = () => {
                </div>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-center flex-1 px-10">
               <ul className="flex items-center gap-5 xl:gap-8 text-base font-bold text-white">
                 {Object.values(Category).slice(0, 5).map((cat) => (
@@ -180,10 +170,8 @@ export const Header: React.FC = () => {
               </ul>
             </nav>
 
-            {/* Desktop Utils */}
             <div className="hidden lg:flex items-center gap-4">
               
-              {/* Premium Search Bar */}
               <div ref={searchRef} className="relative group flex items-center">
                 <form 
                   onSubmit={handleSearchSubmit} 
@@ -191,7 +179,6 @@ export const Header: React.FC = () => {
                     isSearchFocused || searchQuery ? 'w-[300px] bg-white shadow-xl' : 'w-[40px] bg-white/20 hover:bg-white/30'
                   } rounded-full overflow-hidden h-10 border ${isSearchFocused ? 'border-transparent' : 'border-transparent'}`}
                 >
-                   {/* Search Icon / Toggle */}
                    <div 
                       className={`absolute right-0 top-0 h-10 w-10 flex items-center justify-center cursor-pointer z-10 transition-colors duration-300 ${
                         isSearchFocused ? 'text-gray-500' : 'text-white'
@@ -213,7 +200,6 @@ export const Header: React.FC = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
 
-                  {/* Clear Button */}
                   {(isSearchFocused || searchQuery) && (
                     <button 
                       type="button"
@@ -228,7 +214,6 @@ export const Header: React.FC = () => {
                   )}
                 </form>
 
-                {/* Rich Suggestions Dropdown */}
                 {isSearchFocused && searchQuery.length > 1 && (
                   <div className="absolute top-full right-0 mt-3 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in origin-top-right ring-1 ring-black/5">
                     {suggestions.length > 0 ? (
@@ -316,7 +301,6 @@ export const Header: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile Utils */}
             <div className="lg:hidden flex items-center gap-3">
               <Link to={user ? (isAdmin ? "/admin" : "/") : "/login"} className="p-1 text-white hover:bg-white/10 rounded-full transition-colors">
                 <UserIcon size={24} />
@@ -326,7 +310,6 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Mobile Drawer Menu */}
       <div 
         className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${isMenuOpen ? 'visible' : 'invisible'}`}
       >
@@ -350,7 +333,6 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Mobile Search with Suggest */}
           <div className="p-6 pb-2">
              <div className="relative">
                 <form onSubmit={handleSearchSubmit}>
@@ -365,7 +347,6 @@ export const Header: React.FC = () => {
                     <Search size={20} />
                   </button>
                 </form>
-                {/* Mobile Suggestions */}
                 {searchQuery.length > 1 && suggestions.length > 0 && (
                   <div className="mt-2 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
                     {suggestions.map(post => (

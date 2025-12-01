@@ -10,10 +10,10 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Contact } from './pages/Contact';
 import { AccessibilityWidget } from './components/AccessibilityWidget';
-import { Post, Ad, User, Comment, ContactMessage, Category, NewsletterSubscriber, AccessibilitySettings } from './types';
 import { AppContext } from './context/AppContext';
 import { api } from './services/api';
 import { Loader2 } from 'lucide-react';
+import { Post, Ad, User, Comment, ContactMessage, Category, NewsletterSubscriber, AccessibilitySettings } from './types';
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
