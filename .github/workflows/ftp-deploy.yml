@@ -2,23 +2,21 @@ name: FTP Deploy
 
 on:
   push:
-    branches:
-      - main   # או master אם זה הענף שלך
+    branches: ["main"]
 
 jobs:
-  ftp-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Deploy to FTP server
+      - name: Upload to FTP server
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./        # תיקיית הקבצים שלך בריפו
-          server-dir: /public_html/   # זה המיקום שבו האתר שלך צריך להיות בשרת
-          delete: true        # מוחק את כל מה שיש בשרת ומעלה חדש
+          local-dir: ./
+          server-dir: /public_html/
