@@ -29,5 +29,5 @@ jobs:
           protocol: ftp
           local-dir: ./public
           server-dir: /domains/zefetbtnufa.com/public_html/
-          security: explicit
+          security: loose                  # אפשרויות חוקיות: loose | strict
           exclude: ".git/**,node_modules/**,*.log"
