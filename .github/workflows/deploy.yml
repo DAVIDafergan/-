@@ -2,21 +2,27 @@ name: FTP Deploy
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
 
 jobs:
-  deploy:
+  ftp-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Upload to FTP server
+      - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          server-dir: /domains/zefetbtnufa.com/public_html/
+          server: ${{ secrets.FTP_SERVER }}                       # כתובת השרת שלך
+          username: ${{ secrets.FTP_USERNAME }}                   # שם משתמש FTP
+          password: ${{ secrets.FTP_PASSWORD }}                   # סיסמה
+          local-dir: ./                                           # תיקיית המקור במאגר שלך
+          server-dir: /domains/zefetbtnufa.com/public_html/       # תיקיית יעד בשרת (שים לב ל- / בסוף)
+          protocol: ftp                                           # שימוש ב-FTP רגיל
+          port: 21                                                # פורט FTP
+          passive: true                                           # מצב Passive ליציבות חיבור
+          timeout: 180                                            # הגדלת Timeout למניעת ניתוקים
+          concurrency: 1                                          # העלאה סדרתית למניעת בעיות
