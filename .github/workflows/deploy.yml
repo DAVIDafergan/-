@@ -1,6 +1,5 @@
 name: Build & FTP Deploy
 
-# הפעלה אוטומטית על push לסניף main
 on:
   push:
     branches:
@@ -11,28 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Build project (אם יש צורך, אחרת ניתן למחוק את החלק הזה)
       - name: Build project
         run: |
           echo "מכין את הקבצים להעלאה..."
-          # למשל: npm install && npm run build
-          # אם אין build, פשוט דילוג על שלב זה
+          # לדוגמה: npm install && npm run build
+          # אם אין build, ניתן למחוק שלב זה
 
-      # 3️⃣ FTP Deploy
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}                       # כתובת השרת
-          username: ${{ secrets.FTP_USERNAME }}                   # שם משתמש FTP
-          password: ${{ secrets.FTP_PASSWORD }}                   # סיסמה
-          port: 21                                                # פורט FTP
-          protocol: ftp                                           # פרוטוקול FTP
-          local-dir: ./public                                     # תיקיית מקור (קבצי האתר)
-          server-dir: /domains/zefetbtnufa.com/public_html/      # תיקיית יעד בשרת
-          log-level: info                                        # לוג מפורט
-          security: explicit                                     # FTPS explicit אם השרת דורש
-          exclude: ".git/**,node_modules/**,*.log"              # דילוג על קבצים מיותרים
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: ./public
+          server-dir: /domains/zefetbtnufa.com/public_html/
+          log-level: standard        # אפשרות תקפה: minimal | standard | verbose
+          security: explicit
+          exclude: ".git/**,node_modules/**,*.log"
