@@ -1,33 +1,34 @@
-name: FTPS Deploy All Files
+name: SFTP Deploy All Files
 
 on:
   push:
     branches:
-      - main
+      - main  # הסניף שממנו יתבצע הדיפליי
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build project (אופציונלי)
+      # 2️⃣ Build project (אופציונלי)
+      - name: Build project
         run: |
           echo "מכין את הקבצים להעלאה..."
-          # אם אין build, אפשר למחוק את החלק הזה
+          # לדוגמה: npm install && npm run build
+          # אם אין build, ניתן למחוק שלב זה
 
-      - name: Deploy all files via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      # 3️⃣ SFTP Deploy – כל הקבצים
+      - name: Deploy all files via SFTP
+        uses: appleboy/scp-action@v0.1.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          local-dir: ./                                        # כל הקבצים במאגר
-          server-dir: /domains/zefetbtnufa.com/public_html/    # תיקיית יעד בשרת
-          security: strict                                      # FTPS strict
-          exclude: ".git/**,node_modules/**,*.log"            # דילוג על קבצים מיותרים
-
+          host: ${{ secrets.SFTP_SERVER }}         # כתובת השרת שלך
+          username: ${{ secrets.SFTP_USERNAME }}   # שם משתמש SSH/SFTP
+          password: ${{ secrets.SFTP_PASSWORD }}   # סיסמה
+          port: 22                                 # פורט SFTP
+          source: "./"                             # כל הקבצים במאגר
+          target: "/domains/zefetbtnufa.com/public_html/"  # תיקיית יעד בשרת
+          rm: false                                # לא למחוק קבצים קיימים בשרת
