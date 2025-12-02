@@ -10,25 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout הקבצים שלך
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Build project (אופציונלי)
-      - name: Build project
-        run: |
-          echo "מכין את הקבצים להעלאה..."
-          # לדוגמה: npm install && npm run build
-          # אם אין build, ניתן למחוק שלב זה
-
-      # 3️⃣ SFTP Deploy – כל הקבצים
+      # 2️⃣ העלאה לשרת דרך SFTP
       - name: Deploy all files via SFTP
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.SFTP_SERVER }}         # כתובת השרת שלך
-          username: ${{ secrets.SFTP_USERNAME }}   # שם משתמש SSH/SFTP
-          password: ${{ secrets.SFTP_PASSWORD }}   # סיסמה
-          port: 22                                 # פורט SFTP
-          source: "./"                             # כל הקבצים במאגר
-          target: "/domains/zefetbtnufa.com/public_html/"  # תיקיית יעד בשרת
-          rm: false                                # לא למחוק קבצים קיימים בשרת
+          host: ${{ secrets.SFTP_SERVER }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: 22
+          source: "./"                                        # כל הקבצים במאגר
+          target: "/domains/zefetbtnufa.com/public_html/"    # תיקיית יעד בשרת
+          rm: false                                          # לא למחוק קבצים קיימים
