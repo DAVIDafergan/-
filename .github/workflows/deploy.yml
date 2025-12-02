@@ -30,3 +30,4 @@ jobs:
           server-dir: /domains/zefetbtnufa.com/public_html/    # תיקיית יעד בשרת
           security: strict                                      # FTPS strict
           exclude: ".git/**,node_modules/**,*.log"            # דילוג על קבצים מיותרים
+
