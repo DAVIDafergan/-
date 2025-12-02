@@ -16,13 +16,13 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}                       # כתובת השרת שלך
+          server: ${{ secrets.FTP_SERVER }}                       # כתובת השרת
           username: ${{ secrets.FTP_USERNAME }}                   # שם משתמש FTP
           password: ${{ secrets.FTP_PASSWORD }}                   # סיסמה
-          local-dir: ./                                           # תיקיית המקור במאגר שלך
-          server-dir: /domains/zefetbtnufa.com/public_html/       # תיקיית יעד בשרת (שים לב ל- / בסוף)
-          protocol: ftp                                           # שימוש ב-FTP רגיל
-          port: 21                                                # פורט FTP
-          passive: true                                           # מצב Passive ליציבות חיבור
-          timeout: 180                                            # הגדלת Timeout למניעת ניתוקים
-          concurrency: 1                                          # העלאה סדרתית למניעת בעיות
+          port: 21                                                # פורט FTP רגיל
+          protocol: ftp                                           # פרוטוקול FTP
+          local-dir: ./                                           # תיקיית מקור במאגר
+          server-dir: /domains/zefetbtnufa.com/public_html/      # תיקיית יעד בשרת (שים לב ל- / בסוף)
+          log-level: info                                        # רמת לוג (מראה תהליך העלאה)
+          security: explicit                                     # אם השרת דורש FTPS explicit
+          exclude: ".git/**,node_modules/**"                    # דילוג על קבצים מיותרים
