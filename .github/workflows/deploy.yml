@@ -29,6 +29,5 @@ jobs:
           protocol: ftp
           local-dir: ./public
           server-dir: /domains/zefetbtnufa.com/public_html/
-          log-level: standard        # אפשרות תקפה: minimal | standard | verbose
           security: explicit
           exclude: ".git/**,node_modules/**,*.log"
