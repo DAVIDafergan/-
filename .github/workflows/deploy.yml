@@ -1,32 +1,35 @@
-name: Build & FTP Deploy
+name: FTPS Deploy All Files
 
 on:
   push:
     branches:
-      - main
+      - main  # הסניף שממנו יתבצע הדיפליי
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ (אופציונלי) Build project
       - name: Build project
         run: |
           echo "מכין את הקבצים להעלאה..."
-          # לדוגמה: npm install && npm run build
-          # אם אין build, ניתן למחוק שלב זה
+          # אם אין build, אפשר למחוק את החלק הזה
 
-      - name: FTP Deploy
+      # 3️⃣ FTPS Deploy – כל הקבצים
+      - name: Deploy all files via FTPS
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          server-dir: /domains/zefetbtnufa.com/public_html/
-          security: loose                            # loose או strict
-          exclude: ".git/**,node_modules/**,*.log"
+          server: ${{ secrets.FTP_SERVER }}                     # כתובת השרת
+          username: ${{ secrets.FTP_USERNAME }}                 # שם משתמש
+          password: ${{ secrets.FTP_PASSWORD }}                 # סיסמה
+          port: 21                                              # פורט FTP/FTPS
+          protocol: ftp                                        # פרוטוקול FTP
+          local-dir: ./                                        # תיקיית המקור – כל הקבצים
+          server-dir: /domains/zefetbtnufa.com/public_html/    # תיקיית יעד בשרת
+          security: strict                                      # FTPS strict – חובה אם השרת דורש SSL/TLS
+          exclude: ".git/**,node_modules/**,*.log"            # לא להעלות קבצים מיותרים
