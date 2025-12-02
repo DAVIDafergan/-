@@ -21,6 +21,5 @@ jobs:
           protocol: ${{ matrix.protocol }}
           port: ${{ matrix.port }}
           local-dir: ./
-          server-dir: /test-deploy/
           dangerous-clean-slate: false
           timeout: 120
