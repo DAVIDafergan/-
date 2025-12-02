@@ -1,4 +1,4 @@
-name: FTP Deploy
+name: FTPS Deploy All Files
 
 on:
   push:
@@ -6,23 +6,27 @@ on:
       - main
 
 jobs:
-  ftp-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: FTP Deploy
+      - name: Build project (אופציונלי)
+        run: |
+          echo "מכין את הקבצים להעלאה..."
+          # אם אין build, אפשר למחוק את החלק הזה
+
+      - name: Deploy all files via FTPS
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}                       # כתובת השרת
-          username: ${{ secrets.FTP_USERNAME }}                   # שם משתמש FTP
-          password: ${{ secrets.FTP_PASSWORD }}                   # סיסמה
-          port: 21                                                # פורט FTP רגיל
-          protocol: ftp                                           # פרוטוקול FTP
-          local-dir: ./                                           # תיקיית מקור במאגר
-          server-dir: /domains/zefetbtnufa.com/public_html/      # תיקיית יעד בשרת (שים לב ל- / בסוף)
-          log-level: info                                        # רמת לוג (מראה תהליך העלאה)
-          security: explicit                                     # אם השרת דורש FTPS explicit
-          exclude: ".git/**,node_modules/**"                    # דילוג על קבצים מיותרים
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: ./                                        # כל הקבצים במאגר
+          server-dir: /domains/zefetbtnufa.com/public_html/    # תיקיית יעד בשרת
+          security: strict                                      # FTPS strict
+          exclude: ".git/**,node_modules/**,*.log"            # דילוג על קבצים מיותרים
