@@ -1,25 +1,26 @@
-name: FTP Deploy
+name: Deploy to Server via SFTP
 
 on:
   push:
     branches:
-      - main
+      - main  # הסניף שממנו נעשה הדיפליי
 
 jobs:
-  ftp-deploy:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      - name: SFTP Deploy
+        uses: appleboy/scp-action@v0.1.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./                              # תיקיית המקור במאגר שלך
-          server-dir: /domains/zefetbtnufa.com/public_html/  # תיקיית היעד בשרת (שים לב ה- / בסוף)
-          passive: true
-          timeout: 120
-          concurrency: 1
+          host: ${{ secrets.FTP_SERVER }}          # כתובת השרת שלך
+          username: ${{ secrets.FTP_USERNAME }}    # שם משתמש SSH/SFTP
+          password: ${{ secrets.FTP_PASSWORD }}    # סיסמה
+          port: 22                                  # פורט SFTP (22 בדרך כלל)
+          source: "./*"                             # כל הקבצים בתיקיית השורש של הפרויקט
+          target: "/domains/zefetbtnufa.com/public_html/"  # תיקיית היעד בשרת
+          rm: false                                 # אם true, מוחק קבצים שלא נמצאים במקור
+          recursive: true                           # להעלות תיקיות באופן רקורסיבי
