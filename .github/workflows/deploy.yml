@@ -27,7 +27,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
-          local-dir: ./public
           server-dir: /domains/zefetbtnufa.com/public_html/
-          security: loose                  # אפשרויות חוקיות: loose | strict
+          security: loose                            # loose או strict
           exclude: ".git/**,node_modules/**,*.log"
