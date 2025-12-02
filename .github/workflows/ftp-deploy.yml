@@ -1,4 +1,4 @@
-name: SFTP Deploy All Files
+name: FTP Deploy All Files
 
 on:
   push:
@@ -10,18 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout הקבצים שלך
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ העלאה לשרת דרך SFTP
-      - name: Deploy all files via SFTP
-        uses: appleboy/scp-action@v0.1.4
+      # 2️⃣ העלאה לשרת דרך FTP/FTPS
+      - name: Deploy all files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          host: ${{ secrets.SFTP_SERVER }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          port: 22
-          source: "./"                                        # כל הקבצים במאגר
-          target: "/domains/zefetbtnufa.com/public_html/"    # תיקיית יעד בשרת
-          rm: false                                          # לא למחוק קבצים קיימים
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21                       # פורט FTP
+          protocol: ftps                 # אם השרת תומך FTPS, אחרת ftp
+          local-dir: ./                  # כל הקבצים במאגר
+          server-dir: /domains/zefetbtnufa.com/public_html/  # תיקיית יעד בשרת
+          security: strict               # אם משתמשים ב־FTPS
+          exclude: ".git/**,node_modules/**,*.log"  # קבצים לדלג עליהם
