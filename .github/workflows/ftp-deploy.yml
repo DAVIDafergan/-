@@ -3,7 +3,7 @@ name: FTP Deploy
 on:
   push:
     branches:
-      - main  # או הסניף שאתה רוצה להעלות ממנו
+      - main
 
 jobs:
   ftp-deploy:
@@ -18,8 +18,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./             # תיקיית המקור במחשב/מאגר שלך
-          server-dir: /domains/zefetbtnufa.com/public_html  # תיקיית היעד בשרת
-          passive: true             # מומלץ לחיבור יציב
-          timeout: 120              # הגדלת זמן Timeout
-          concurrency: 1            # העלאה סדרתית (מקטין סיכוי לבעיה)
+          local-dir: ./                              # תיקיית המקור במאגר שלך
+          server-dir: /domains/zefetbtnufa.com/public_html/  # תיקיית היעד בשרת (שים לב ה- / בסוף)
+          passive: true
+          timeout: 120
+          concurrency: 1
